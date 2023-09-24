@@ -30,7 +30,7 @@ def list_cupcakes():
 def find_cupcake(cid):
     """return JSON for selected cupcake by id"""
 
-    cupcake = db.session.get(Cupcake, cid)
+    cupcake = Cupcake.query.get_or_404(cid)
     return jsonify(cupcake=cupcake.serialize())
 
 @app.route('/api/cupcakes', methods=["POST"])
@@ -44,3 +44,24 @@ def create_cupcake():
     db.session.add(new_cupcake)
     db.session.commit()
     return (jsonify(cupcake=new_cupcake.serialize()), 201)
+
+@app.route('/api/cupcakes/<int:cid>', methods=["PATCH"])
+def update_cupcake(cid):
+    """takes cupcake object and updates values, assumes full cupcake object is passed to backend"""
+
+    cupcake = Cupcake.query.get_or_404(cid)
+    cupcake.flavor = request.json.get("flavor", cupcake.flavor)
+    cupcake.size = request.json.get("size", cupcake.size)
+    cupcake.rating = request.json.get("rating", cupcake.rating)
+    cupcake.image = request.json.get("image", cupcake.image)
+    db.session.commit()
+    return jsonify(cupcake=cupcake.serialize())
+
+@app.route('/api/cupcakes/<int:cid>', methods=["DELETE"])
+def delete_cupcake(cid):
+    """deletes selected cupcake"""
+
+    cupcake = Cupcake.query.get_or_404(cid)
+    db.session.delete(cupcake)
+    db.session.commit()
+    return jsonify(message=f"cupcake {cid} deleted")
