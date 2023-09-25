@@ -17,7 +17,7 @@ connect_db(app)
 
 @app.route('/')
 def show_index():
-    return '<body>hello</body>'
+    return render_template('index.html')
 
 @app.route('/api/cupcakes')
 def list_cupcakes():
